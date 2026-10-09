@@ -6,6 +6,8 @@ While Claude works, a space battle fills the band right above the prompt: starfi
 
 ![Galactic Battle demo](docs/demo.svg)
 
+[▶ 18-second video](https://github.com/DarkVelours/claude-code-galactic-battle/releases/download/v1.1.0/galactic-battle-demo.mp4) (a scripted turn drawn by the mod's own code)
+
 - A starfield on two scrolling layers, a desert planet with twin suns, and a battle station drifting by.
 - **The fight follows your session.** Every tool Claude runs successfully is a rebel shot that downs an imperial fighter; every tool that fails is an imperial shot that downs a rebel one. The score is the real count **for the current turn**, and starts again at 0 on the next one: `REBELS 24 vs 1 EMPIRE` means 24 tool calls worked and 1 failed. Only what the main thread runs counts. A helper's own tool calls don't, and neither does a call you refused at a permission prompt.
 - **Each helper (subagent) is one more rebel fighter**, listed with its model and how long it has been running.
@@ -97,6 +99,7 @@ A mod isn't sandboxed, so here is what this one does. `claude plugin validate .`
 claude plugin validate .        # manifest, marketplace, hooks module
 claude plugin test .            # tests/*.test.ts
 npx tsx docs/make-demo.tsx docs/demo.svg   # redraws the demo from the real code
+npm i --no-save playwright-core && CHROME=/path/to/chrome node docs/make-video.mjs   # re-encodes the MP4 into the current folder (needs ffmpeg; attach it to a release, it is not kept in the repo)
 claude --plugin-dir .           # a session running this folder, reloaded on edit
 npx -p typescript tsc -p .      # type-check (after one load writes .claude-plugin/types/)
 ```

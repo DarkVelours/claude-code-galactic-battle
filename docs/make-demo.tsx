@@ -1,5 +1,7 @@
 // Draws docs/demo.svg from the real battle module, with a scripted turn.
 //   npx tsx docs/make-demo.tsx docs/demo.svg
+// FRAMES=120 gives the full-rate turn that make-video.mjs uses; the default (60) keeps the README
+// file under the 256 KiB the Claude directory accepts for a text file.
 import { writeFile } from 'node:fs/promises'
 
 import { en } from '../locales/en.ts'
@@ -77,8 +79,8 @@ const runsOf = (row: any): Run[] =>
     : flat(row.props.children).map((t: any) => ({ t: flat(t.props.children).join(''), c: t.props.color, b: !!t.props.bold }))
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-const FRAMES = 120
-const TICKS_PER_FRAME = 2
+const FRAMES = Number(process.env.FRAMES ?? 60)
+const TICKS_PER_FRAME = 240 / FRAMES
 const DT = 0.1
 const W = 9.6
 const LH = 20
