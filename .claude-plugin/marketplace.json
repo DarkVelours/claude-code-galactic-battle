@@ -1,0 +1,18 @@
+{
+  "name": "galactic-battle",
+  "owner": {
+    "name": "Dark Velours"
+  },
+  "metadata": {
+    "description": "A space battle in place of Claude Code's spinner.",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "galactic-battle",
+      "source": "./",
+      "description": "Animated space battle in place of the spinner, blaster sounds, optional music, EN/FR.",
+      "category": "fun"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "galactic-battle",
+  "version": "1.1.0",
+  "description": "Turns Claude Code's spinner into an animated space battle driven by what Claude does (tool results, helpers), with a double-bladed lightsaber gauge for context and quota, blaster sounds and optional music.",
+  "author": {
+    "name": "Dark Velours",
+    "url": "https://github.com/DarkVelours"
+  },
+  "homepage": "https://github.com/DarkVelours/claude-code-galactic-battle",
+  "repository": "https://github.com/DarkVelours/claude-code-galactic-battle",
+  "license": "MIT",
+  "keywords": [
+    "fun",
+    "spinner",
+    "animation",
+    "space",
+    "terminal",
+    "mod"
+  ],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the battle's texts and of /battle's answers. auto follows LANG.",
+      "default": "auto",
+      "options": [
+        "auto",
+        "en",
+        "fr"
+      ]
+    },
+    "musicFile": {
+      "type": "string",
+      "title": "Music file",
+      "description": "Absolute path (or ~/...) of the music played during a turn once /battle music on. Empty: ~/.claude/galactic-battle/music.mp3",
+      "default": ""
+    },
+    "volume": {
+      "type": "number",
+      "title": "Volume",
+      "description": "Volume of the blaster and the music, 0 to 100.",
+      "default": 40
+    },
+    "details": {
+      "type": "string",
+      "title": "Info shown",
+      "description": "tool: the battle shows tool names only. full: it also shows file names and commands (hide it when you record your screen).",
+      "default": "tool",
+      "options": [
+        "tool",
+        "full"
+      ]
+    }
+  }
+}
