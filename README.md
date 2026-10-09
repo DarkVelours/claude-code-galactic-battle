@@ -69,9 +69,9 @@ The music starts with the turn, loops, and stops at the end of the turn, when yo
 
 | | Battle | Blaster | Music |
 |---|---|---|---|
-| Linux / WSL2 (WSLg) | ✅ | ✅ `paplay` (or `ffplay`) | ✅ `ffplay` |
-| macOS | ✅ | ⚠️ `afplay` (untested) | ⚠️ `ffplay` or an `afplay` loop (untested) |
-| Windows (native) | ✅ | ❌ | ❌ |
+| Linux / WSL2 (WSLg) | ✅ tested | ✅ `paplay` (or `ffplay`) | ✅ `ffplay` |
+| macOS | ⚠️ untested | ⚠️ `afplay` (untested) | ⚠️ `ffplay` or an `afplay` loop (untested) |
+| Windows (native terminal) | ⚠️ untested | ❌ | ❌ |
 | Claude desktop / IDE | the normal spinner, no battle | – | – |
 
 The engine's own audio player (`$.audio.play`) only plays on macOS, so the plugin calls shell players itself. On Linux, install `pulseaudio-utils` (`paplay`) and/or `ffmpeg` (`ffplay`). If you've tested on macOS, a report is welcome.

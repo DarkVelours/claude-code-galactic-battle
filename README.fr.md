@@ -69,9 +69,9 @@ La musique démarre avec le tour, tourne en boucle, et s'arrête à la fin du to
 
 | | Bataille | Blaster | Musique |
 |---|---|---|---|
-| Linux / WSL2 (WSLg) | ✅ | ✅ `paplay` (ou `ffplay`) | ✅ `ffplay` |
-| macOS | ✅ | ⚠️ `afplay` (non testé) | ⚠️ `ffplay` ou une boucle `afplay` (non testé) |
-| Windows (natif) | ✅ | ❌ | ❌ |
+| Linux / WSL2 (WSLg) | ✅ testé | ✅ `paplay` (ou `ffplay`) | ✅ `ffplay` |
+| macOS | ⚠️ non testé | ⚠️ `afplay` (non testé) | ⚠️ `ffplay` ou une boucle `afplay` (non testé) |
+| Windows (terminal natif) | ⚠️ non testé | ❌ | ❌ |
 | Claude desktop / IDE | spinner normal, pas de bataille | – | – |
 
 Le lecteur audio intégré au moteur (`$.audio.play`) ne joue que sur macOS, donc le plugin appelle lui-même des lecteurs en ligne de commande. Sous Linux, installe `pulseaudio-utils` (`paplay`) et/ou `ffmpeg` (`ffplay`). Si tu as testé sur macOS, un retour est bienvenu.
