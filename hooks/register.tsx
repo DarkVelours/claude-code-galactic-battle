@@ -380,9 +380,13 @@ export const register: Register = (on, options) => {
   })
 
   // Every tool call feeds the battle: a result is a win, an error a loss, a
-  // running Agent call is a helper. The hook only watches: the call and its
-  // result go through untouched, and if this hook fails it is skipped.
+  // running Agent call is a helper. A call refused by a permission is neither,
+  // and a helper's own tool calls (agentId set) are left out: the score is
+  // what the main thread did this turn. The hook only watches: the call and
+  // its result go through untouched, and if this hook fails it is skipped.
   on('tool.call', async ($, e, next) => {
+    if (e.agentId) return next(e)
+
     const args = e as unknown as Record<string, unknown>
     const id = e.tool_use_id ?? `${e.tool}-${live.ok + live.err}`
     const isHelper = e.tool === 'Agent'
@@ -394,6 +398,7 @@ export const register: Register = (on, options) => {
     }
 
     let isFailed = false
+    let isDenied = false
     let isBackground = false
 
     try {
@@ -401,7 +406,8 @@ export const register: Register = (on, options) => {
       // A background Agent call returns at once while the helper keeps working:
       // it stays on the battlefield until the turn ends.
       isBackground = isHelper && 'text' in result && /async agent launched/i.test(String(result.text))
-      isFailed = ('isError' in result && result.isError === true) || ('deny' in result && Boolean(result.deny))
+      isDenied = 'deny' in result && Boolean(result.deny)
+      isFailed = 'isError' in result && result.isError === true
 
       return result
     } catch (error) {
@@ -411,7 +417,9 @@ export const register: Register = (on, options) => {
     } finally {
       if (!isBackground) live.helpers.delete(id)
 
-      if (isFailed) {
+      if (isDenied) {
+        // refused by a permission: not a tool failure, nobody scores
+      } else if (isFailed) {
         live.err += 1
       } else {
         live.ok += 1

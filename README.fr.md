@@ -7,7 +7,7 @@ Pendant que Claude bosse, une bataille spatiale occupe la bande juste au-dessus 
 ![Démo Galactic Battle](docs/demo.svg)
 
 - Un fond étoilé sur deux couches qui défilent, une planète désertique et ses deux soleils, une station de combat qui dérive.
-- **Le combat suit ta session.** Chaque outil que Claude lance avec succès est un tir rebelle qui abat un chasseur impérial ; chaque outil qui échoue est un tir impérial qui abat un chasseur rebelle. Le score est le vrai décompte : `REBELLES 24 vs 1 EMPIRE` veut dire que 24 appels d'outils ont marché et 1 a échoué.
+- **Le combat suit ta session.** Chaque outil que Claude lance avec succès est un tir rebelle qui abat un chasseur impérial ; chaque outil qui échoue est un tir impérial qui abat un chasseur rebelle. Le score est le vrai décompte **du tour en cours**, et repart à 0 au tour suivant : `REBELLES 24 vs 1 EMPIRE` veut dire que 24 appels d'outils ont marché et 1 a échoué. Seul ce que lance le fil principal compte. Les appels d'outils d'un sous-agent ne comptent pas, ni un appel que tu refuses à une demande de permission.
 - **Chaque sous-agent est un chasseur rebelle de plus**, listé avec son modèle et son temps d'exécution.
 - **Une jauge en sabre laser à double lame.** La lame de gauche est ta fenêtre de contexte. La lame de droite est ta limite d'usage sur 5 h, avec ce que le tour en cours a déjà coûté (`+0.4`). Bleue quand tout va bien, violette dès 50 %, rouge instable qui vacille quand ça devient serré (70 % du contexte, 80 % du quota).
 - **Une ligne en direct** avec l'outil que Claude est en train de lancer, et le nombre d'outils et de fichiers utilisés jusque-là.

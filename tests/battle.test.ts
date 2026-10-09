@@ -194,6 +194,26 @@ test('tool results drive the score, the files and the action line', async ($, on
   await ui.unmount()
 })
 
+test('the score is the main thread’s: helpers’ tool calls and refused calls do not count', async ($, on) => {
+  host(on)
+  on('tool.call', ($, e) =>
+    e.tool === 'Write' ? ({ deny: 'refused' } as never) : ({ result: 'ok', text: 'ok' } as never),
+  )
+  engineSpinner(on)
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
+  await startTurn($)
+
+  await $.tool.call({ tool: 'Read', file_path: '/work/a.ts' })
+  await $.tool.call({ tool: 'Read', file_path: '/work/b.ts', agentId: 'a1' } as never)
+  await $.tool.call({ tool: 'Write', file_path: '/work/c.ts', content: 'x' })
+  await ui.advance(70)
+
+  expect(await ui.find({ in: 'battle', text: /REBELS 1/ })).toBeDefined()
+  expect(await ui.find({ in: 'battle', text: /0 EMPIRE/ })).toBeDefined()
+  expect(await ui.find({ in: 'battle', text: /1 tool\b/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('info full shows file names and commands', { options: { details: 'full' } }, async ($, on) => {
   host(on)
   tools(on)

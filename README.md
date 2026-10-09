@@ -7,7 +7,7 @@ While Claude works, a space battle fills the band right above the prompt: starfi
 ![Galactic Battle demo](docs/demo.svg)
 
 - A starfield on two scrolling layers, a desert planet with twin suns, and a battle station drifting by.
-- **The fight follows your session.** Every tool Claude runs successfully is a rebel shot that downs an imperial fighter; every tool that fails is an imperial shot that downs a rebel one. The score is the real count: `REBELS 24 vs 1 EMPIRE` means 24 tool calls worked and 1 failed.
+- **The fight follows your session.** Every tool Claude runs successfully is a rebel shot that downs an imperial fighter; every tool that fails is an imperial shot that downs a rebel one. The score is the real count **for the current turn**, and starts again at 0 on the next one: `REBELS 24 vs 1 EMPIRE` means 24 tool calls worked and 1 failed. Only what the main thread runs counts. A helper's own tool calls don't, and neither does a call you refused at a permission prompt.
 - **Each helper (subagent) is one more rebel fighter**, listed with its model and how long it has been running.
 - **A double-bladed lightsaber gauge.** The left blade is your context window. The right blade is your 5-hour usage limit, with what the current turn has cost so far (`+0.4`). Blue while it's calm, purple from 50 %, flickering red when it gets unstable (70 % of the context, 80 % of the quota).
 - **A live line** with the tool Claude is running now, and how many tools and files it has used so far.
