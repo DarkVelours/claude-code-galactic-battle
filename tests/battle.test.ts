@@ -8,13 +8,27 @@ const SPINNER = {
   viewport: { columns: 100, rows: 40 },
 } as const
 
-// Stands for the engine's own spinner line beneath the plugin.
-const engineSpinner = (on: On) =>
-  on('ui.render', { component: 'Spinner' }, ($, e) => {
+// The band above the prompt, while Claude works.
+const BAND = {
+  plugin: 'galactic-battle',
+  component: 'AbovePrompt',
+  props: { hasSurvey: false, isWorking: true, maxRows: 10, bodyColumns: 100, scroll: { offset: 0, bodyRows: 10 }, view: {} },
+} as never
+
+// Stands for the engine's own spinner line and the bands beneath the plugin.
+const engineSpinner = (on: On) => {
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Text } = $.ui.resolve(e)
+
+    return Text({ key: 'prompt', children: 'input' })
+  })
+
+  return on('ui.render', { component: 'Spinner' }, ($, e) => {
     const { Text } = $.ui.resolve(e)
 
     return Text({ key: 'engine', children: `${e.props.word}…` })
   })
+}
 
 // A host where no shell player answers and no file exists but the ones listed.
 const host = (on: On, files: string[] = [], env: Record<string, string> = {}) => {
@@ -63,13 +77,12 @@ const run = async ($: Dollar, args: string) => {
   return 'text' in r ? String(r.text) : JSON.stringify(r)
 }
 
-test('the spinner becomes a space battle that animates', async ($, on) => {
+test('a space battle animates above the prompt while Claude works', async ($, on) => {
   host(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
 
   expect(await ui.find({ type: 'Client', key: 'battle' })).toBeDefined()
-  expect((await ui.find({ key: 'engine' }))?.text).not.toBe('Sauteing…')
 
   await ui.advance(70)
   expect(await ui.find({ in: 'battle', text: /REBELS/ })).toBeDefined()
@@ -88,7 +101,7 @@ test('the spinner becomes a space battle that animates', async ($, on) => {
 test('French texts when the language option says fr', { options: { language: 'fr' } }, async ($, on) => {
   host(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await ui.advance(70)
 
   expect(await ui.find({ in: 'battle', text: /REBELLES/ })).toBeDefined()
@@ -96,10 +109,10 @@ test('French texts when the language option says fr', { options: { language: 'fr
   await ui.unmount()
 })
 
-test('the desktop keeps the engine spinner', async ($, on) => {
+test('the desktop draws no battle', async ($, on) => {
   host(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'desktop' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' } as never)
 
   expect(await ui.find({ type: 'Client' })).toBeUndefined()
   await ui.unmount()
@@ -108,7 +121,7 @@ test('the desktop keeps the engine spinner', async ($, on) => {
 test('explosions fire one blaster per 2.5 s through a shell player', async ($, on) => {
   const runs = host(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   runs.length = 0
 
   await ui.post({ boom: true }, { in: 'battle' })
@@ -164,7 +177,7 @@ test('tool results drive the score, the files and the action line', async ($, on
   host(on)
   tools(on, ['Bash'])
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
 
   await $.tool.call({ tool: 'Read', file_path: '/work/a.ts' })
@@ -185,7 +198,7 @@ test('info full shows file names and commands', { options: { details: 'full' } }
   host(on)
   tools(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
 
   await $.tool.call({ tool: 'Edit', file_path: '/work/dir/b.ts', old_string: 'a', new_string: 'b' })
@@ -202,7 +215,7 @@ test('the saber shows the context and the quota, and what this turn cost', async
   host(on)
   tools(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
   await ui.advance(70)
 
@@ -225,7 +238,7 @@ test('a running Agent call is a helper with its own fighter and line', async ($,
   let release = () => {}
   tools(on, [], new Promise<void>(resolve => (release = resolve)))
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
 
   const call = $.tool.call({ tool: 'Agent', description: 'scan', prompt: 'p', subagent_type: 'Explore', model: 'haiku' })
@@ -245,7 +258,7 @@ test('a background Agent call stays a helper until the turn ends', async ($, on)
   host(on)
   tools(on, [], undefined, true)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
 
   await $.tool.call({ tool: 'Agent', description: 'scan', prompt: 'p', subagent_type: 'Explore', model: 'haiku' })
@@ -275,23 +288,30 @@ test('a helper’s turn does not stop the music of the main turn', { options: { 
   expect(runs.length).toBeGreaterThan(started)
 })
 
-test('a helper’s own spinner does not draw a second battle', async ($, on) => {
+test('the spinner keeps its own line with themed words and no battle', async ($, on) => {
   host(on)
   engineSpinner(on)
-  const main = await $.ui.mount({ ...SPINNER, surface: 'terminal', requestId: 'main' })
-  const helper = await $.ui.mount({ ...SPINNER, surface: 'terminal', requestId: 'agent-7' })
+  const spinner = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
 
-  expect(await main.find({ type: 'Client' })).toBeDefined()
-  expect(await helper.find({ type: 'Client' })).toBeUndefined()
-  await main.unmount()
-  await helper.unmount()
+  expect(await spinner.find({ type: 'Client' })).toBeUndefined()
+  expect((await spinner.find({ key: 'engine' }))?.text).not.toBe('Sauteing…')
+  await spinner.unmount()
+})
+
+test('no battle once the work is over', async ($, on) => {
+  host(on)
+  engineSpinner(on)
+  const idle = await $.ui.mount({ ...BAND, props: { ...(BAND as { props: object }).props, isWorking: false }, surface: 'terminal' } as never)
+
+  expect(await idle.find({ type: 'Client' })).toBeUndefined()
+  await idle.unmount()
 })
 
 test('successful tools make the battle explode and the blaster fire', async ($, on) => {
   const runs = host(on)
   tools(on)
   engineSpinner(on)
-  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' } as never)
   await startTurn($)
   await ui.advance(70)
   runs.length = 0

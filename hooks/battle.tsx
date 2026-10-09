@@ -80,6 +80,8 @@ const C = {
   laserRebelDim: '#7a2a2a',
   laserEmpireDim: '#2a7a45',
   falcon: '#f5e6c8',
+  scoreGood: '#3bff6b',
+  scoreBad: '#ff3b3b',
   hud: '#ffd23f',
   hudDim: '#778da9',
   helperText: '#6fb8d6',
@@ -579,11 +581,11 @@ const Battle: ClientModule<Props, Battle> = (props, surface) => {
         ))}
       </Box>
       <Box key="hud" flexDirection="row">
-        <Text color={C.laserRebel} bold>
+        <Text color={C.scoreGood} bold>
           {` ✦ ${text.rebels} ${intel.ok}`}
         </Text>
         <Text color={C.hudDim}>{' vs '}</Text>
-        <Text color={C.laserEmpire} bold>
+        <Text color={C.scoreBad} bold>
           {`${intel.err} ${text.empire} ⬢ `}
         </Text>
         <Text color={C.hud}>{`· ${fit(now, room)}`}</Text>

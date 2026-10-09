@@ -23,8 +23,6 @@ const USER_DIR = '.claude/galactic-battle'
 const SOUND_GAP_MS = 2500
 // How often the context and quota are read while a turn runs.
 const TICK_MS = 800
-// A spinner that stopped drawing this long ago hands the battle to another one.
-const HOST_TIMEOUT_MS = 3000
 
 const FILE_TOOLS = ['Edit', 'Write', 'MultiEdit', 'NotebookEdit']
 
@@ -97,8 +95,7 @@ type Live = {
   ctx: number | null
   quota: number | null
   quotaBase: number | null
-  host: string | null
-  hostSeenAt: number
+  mode: string
 }
 
 const fresh = (): Live => ({
@@ -111,8 +108,7 @@ const fresh = (): Live => ({
   ctx: null,
   quota: null,
   quotaBase: null,
-  host: null,
-  hostSeenAt: 0,
+  mode: '',
 })
 
 let live = fresh()
@@ -370,7 +366,6 @@ export const register: Register = (on, options) => {
     if (e.agentId) return next(e)
 
     live.isTurn = false
-    live.host = null
     live.helpers.clear()
     await stopMusic($)
 
@@ -453,27 +448,33 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
+  // The spinner keeps its own line, with themed words; the battle itself is
+  // drawn in the band just above the prompt (below).
   on('ui.render', { component: 'Spinner' }, async ($, e, next) => {
     if (e.surface !== 'terminal' || !(await read($, isOn))) {
       return next(e)
     }
 
-    // Helpers draw spinners of their own: the battle belongs to the first
-    // one seen, and moves on only if that one stops drawing.
-    const now = await $.clock.now()
-
-    if (live.host === null || (live.host !== e.requestId && now - live.hostSeenAt > HOST_TIMEOUT_MS)) {
-      live.host = e.requestId
-    }
-
-    if (live.host !== e.requestId) return next(e)
-    live.hostSeenAt = now
-
+    live.mode = e.props.mode
     await resolveLanguage($, options.language)
     const locale = t()
     const word = locale.spinnerWords[hash(e.props.word) % locale.spinnerWords.length] ?? e.props.word
-    const engine = await next({ ...e, props: { ...e.props, word } })
-    const columns = Math.min(Math.max((e.viewport?.columns ?? 80) - 4, 30), 160)
+
+    return next({ ...e, props: { ...e.props, word } })
+  })
+
+  // The battle sits in the AbovePrompt slot, under the other bands, so it is
+  // the nearest thing to the input box. Only while Claude works.
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    const below = await next(e)
+
+    if (e.surface !== 'terminal' || e.props.hasSurvey || !(await read($, isOn))) return below
+    if (!live.isTurn && !e.props.isWorking) return below
+
+    await resolveLanguage($, options.language)
+    const locale = t()
+    const now = await $.clock.now()
+    const columns = Math.min(Math.max(e.props.bodyColumns - 2, 30), 160)
     const battleText = {
       quotes: locale.quotes,
       modes: locale.modes,
@@ -502,12 +503,15 @@ export const register: Register = (on, options) => {
       quotaDelta,
     }
     const { Box, Client } = $.ui.resolve(e)
+    const battle = <Client key="battle" module="./battle.tsx" props={{ columns, mode: live.mode, text: battleText, intel }} />
 
-    return (
+    return below ? (
       <Box flexDirection="column">
-        <Client key="battle" module="./battle.tsx" props={{ columns, mode: e.props.mode, text: battleText, intel }} />
-        {engine}
+        {below}
+        {battle}
       </Box>
+    ) : (
+      battle
     )
   })
 }

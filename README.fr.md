@@ -2,7 +2,7 @@
 
 [English](README.md) · **Français**
 
-Pendant que Claude bosse, son spinner devient une bataille spatiale : chasseurs qui s'échangent des lasers sur fond étoilé, explosions, score en direct, et de temps en temps un cargo très rapide. Il y a aussi des bruits de blaster, et tu peux ajouter de la musique.
+Pendant que Claude bosse, une bataille spatiale occupe la bande juste au-dessus de la saisie : chasseurs qui s'échangent des lasers sur fond étoilé, explosions, score en direct, et de temps en temps un cargo très rapide. Il y a aussi des bruits de blaster, et tu peux ajouter de la musique.
 
 ![Démo Galactic Battle](docs/demo.svg)
 
@@ -11,7 +11,7 @@ Pendant que Claude bosse, son spinner devient une bataille spatiale : chasseurs 
 - **Chaque sous-agent est un chasseur rebelle de plus**, listé avec son modèle et son temps d'exécution.
 - **Une jauge en sabre laser à double lame.** La lame de gauche est ta fenêtre de contexte. La lame de droite est ta limite d'usage sur 5 h, avec ce que le tour en cours a déjà coûté (`+0.4`). Bleue quand tout va bien, violette dès 50 %, rouge instable qui vacille quand ça devient serré (70 % du contexte, 80 % du quota).
 - **Une ligne en direct** avec l'outil que Claude est en train de lancer, et le nombre d'outils et de fichiers utilisés jusque-là.
-- Les mots du spinner deviennent *Passage en hyperespace*, *Négociation avec les Hutts*… Le temps écoulé et les tokens restent affichés.
+- Le spinner garde sa ligne, et ses mots deviennent *Passage en hyperespace*, *Négociation avec les Hutts*… Le temps écoulé et les tokens restent affichés.
 - Un bruit de blaster sur les explosions, un toutes les 2,5 s au maximum, et une musique en option, en boucle pendant le tour.
 - En anglais et en français.
 - Aucun appel au modèle, aucun token consommé. L'animation tourne sur l'horloge d'images du terminal, environ 14 images/s.
@@ -25,12 +25,13 @@ Claude Code ne donne pas aux mods les tokens ni le coût de chaque sous-agent, d
 Dans une session Claude Code en terminal :
 
 ```
-/plugin install galactic-battle --marketplace DarkVelours/claude-code-galactic-battle
+/plugin marketplace add DarkVelours/claude-code-galactic-battle
+/plugin install galactic-battle@galactic-battle
 ```
 
-Réponds `y` pour ajouter la marketplace, puis appuie sur Entrée pour choisir la portée utilisateur. La bataille apparaît au prompt suivant.
+Choisis la portée utilisateur, puis réponds aux quatre options (langue, fichier de musique, volume, infos affichées). Tu pourras les changer plus tard dans `/config`. Lance `/reload-plugins` si la bataille n'apparaît pas au prompt suivant.
 
-Il faut une version de Claude Code qui gère les mods (function hooks). Testé sur **Claude Code 2.1.295**. Les mods sont en accès anticipé, leur API peut changer d'une version à l'autre. Si la bataille disparaît après une mise à jour, ouvre une issue.
+Il faut une version de Claude Code qui gère les mods (function hooks). Testé sur **Claude Code 2.1.296**. Les mods sont en accès anticipé, leur API peut changer d'une version à l'autre. Si la bataille disparaît après une mise à jour, ouvre une issue.
 
 ## Commandes
 
@@ -71,13 +72,13 @@ La musique démarre avec le tour, tourne en boucle, et s'arrête à la fin du to
 | Linux / WSL2 (WSLg) | ✅ | ✅ `paplay` (ou `ffplay`) | ✅ `ffplay` |
 | macOS | ✅ | ⚠️ `afplay` (non testé) | ⚠️ `ffplay` ou une boucle `afplay` (non testé) |
 | Windows (natif) | ✅ | ❌ | ❌ |
-| Claude desktop / IDE | spinner normal | – | – |
+| Claude desktop / IDE | spinner normal, pas de bataille | – | – |
 
 Le lecteur audio intégré au moteur (`$.audio.play`) ne joue que sur macOS, donc le plugin appelle lui-même des lecteurs en ligne de commande. Sous Linux, installe `pulseaudio-utils` (`paplay`) et/ou `ffmpeg` (`ffplay`). Si tu as testé sur macOS, un retour est bienvenu.
 
 ## Fonctionnement
 
-- `hooks/register.tsx` se branche sur `ui.render` pour le composant `Spinner`. Il dessine un `Client` au-dessus de la ligne de spinner du moteur, avec les mots réécrits. Il surveille aussi `tool.call` pour compter les réussites, les erreurs et les sous-agents en cours, lit `$.session.usage()` pour les deux jauges, répond à `/battle`, et lance ou coupe les sons sur `turn.start`, `turn.complete` et `ui.message`.
+- `hooks/register.tsx` se branche deux fois sur `ui.render`. Sur `Spinner`, il réécrit les mots. Sur `AbovePrompt`, il dessine le `Client` sous les autres bandes : la bataille est collée à la zone de saisie, et seulement quand Claude bosse. Il surveille aussi `tool.call` pour compter les réussites, les erreurs et les sous-agents en cours, lit `$.session.usage()` pour les deux jauges, répond à `/battle`, et lance ou coupe les sons sur `turn.start`, `turn.complete` et `ui.message`.
 - `hooks/battle.tsx` est le module de surface du `Client`. Le combat et le dessin tournent sur l'horloge d'images du terminal (`surface.every`), donc aucun hook n'est appelé à chaque image. Il lit les chiffres que le module de hooks lui envoie en props, et renvoie `{ boom: true }` pour déclencher le blaster.
 - `locales/*.ts` contiennent tous les textes, un fichier par langue.
 

@@ -4,14 +4,14 @@
     "name": "Dark Velours"
   },
   "metadata": {
-    "description": "A space battle in place of Claude Code's spinner.",
+    "description": "A space battle above Claude Code's prompt while it works.",
     "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "galactic-battle",
       "source": "./",
-      "description": "Animated space battle in place of the spinner, blaster sounds, optional music, EN/FR.",
+      "description": "Animated space battle above the prompt, blaster sounds, optional music, EN/FR.",
       "category": "fun"
     }
   ]

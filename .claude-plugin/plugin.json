@@ -1,7 +1,7 @@
 {
   "name": "galactic-battle",
   "version": "1.1.0",
-  "description": "Turns Claude Code's spinner into an animated space battle driven by what Claude does (tool results, helpers), with a double-bladed lightsaber gauge for context and quota, blaster sounds and optional music.",
+  "description": "Draws an animated space battle above the prompt while Claude works, driven by what Claude does (tool results, helpers), with a double-bladed lightsaber gauge for context and quota, blaster sounds and optional music.",
   "author": {
     "name": "Dark Velours",
     "url": "https://github.com/DarkVelours"
