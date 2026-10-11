@@ -8,6 +8,12 @@ Pendant que Claude bosse, une bataille spatiale occupe la bande juste au-dessus 
 
 [▶ Vidéo de 18 secondes](https://github.com/DarkVelours/claude-code-galactic-battle/releases/download/v1.1.0/galactic-battle-demo.mp4) (un tour scripté, dessiné par le code du mod)
 
+Une vraie capture d'une session en cours (`/battle info tool`) : score, sabre laser et un chasseur de sous-agent.
+
+![Vraie capture d'une session Claude Code avec la bande de bataille](docs/real-capture.png)
+
+📝 L'article sur les pièges rencontrés en le construisant : [blog.darkvelours.fr](https://blog.darkvelours.fr/galactic-battle-mod-claude-code/)
+
 - Un fond étoilé sur deux couches qui défilent, une planète désertique et ses deux soleils, une station de combat qui dérive.
 - **Le combat suit ta session.** Chaque outil que Claude lance avec succès est un tir rebelle qui abat un chasseur impérial ; chaque outil qui échoue est un tir impérial qui abat un chasseur rebelle. Le score est le vrai décompte **du tour en cours**, et repart à 0 au tour suivant : `REBELLES 24 vs 1 EMPIRE` veut dire que 24 appels d'outils ont marché et 1 a échoué. Seul ce que lance le fil principal compte. Les appels d'outils d'un sous-agent ne comptent pas, ni un appel que tu refuses à une demande de permission.
 - **Chaque sous-agent est un chasseur rebelle de plus**, listé avec son modèle et son temps d'exécution.
